@@ -1,10 +1,11 @@
-from web_search_and_scraping import WebSearchAndScraping
-from text_summarization import TextSummarization
-from file_management import FileManagement
-from duplicate_content_management import DuplicateContentManagement
-from error_handling import ErrorHandling
+from web_searcher import WebSearchAndScraping
+from TextSummarizer import TextSummarization
+from FileManager import FileManagement
+from DuplicateDetector import DuplicateContentManagement
+from ErrorLogger import ErrorHandling
 
 error_log = ErrorHandling('main_errors.log') 
+
 def main():
     #全クラス初期化
     web_search = WebSearchAndScraping()
@@ -38,6 +39,7 @@ def main():
     
     # Create a zip file for all the saved summaries
     file_mng.create_zip_file()
+
 
 if __name__ == "__main__":
     main()
