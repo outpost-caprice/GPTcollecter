@@ -1,5 +1,5 @@
-from web_searcher import WebScraper
-from TextSummarizer import TextSummarizer  
+from web_searcher import WebSearcher
+from TextSummarizer import ImprovedText
 from FileManager import FileManager
 from DuplicateDetector import DuplicateDetector
 from ErrorLogger import ErrorLogger
@@ -8,8 +8,8 @@ error_log = ErrorLogger('main_errors.log')
 
 def main():
 
-  scraper = WebScraper()
-  summarizer = TextSummarizer()
+  scraper = WebSearcher()
+  summarizer = ImprovedText()
   file_mgr = FileManager('summaries') 
   dup_detector = DuplicateDetector()
   err_logger = ErrorLogger('errors.log')

@@ -1,6 +1,6 @@
 import streamlit as st
-from web_searcher import WebScraper 
-from TextSummarizer import TextSummarizer
+from web_searcher import WebSearcher
+from TextSummarizer import ImprovedText
 from FileManager import FileManager
 from DuplicateDetector import DuplicateDetector
 from ErrorLogger import ErrorLogger
@@ -15,8 +15,8 @@ progress_bar = st.progress(0)
 @st.cache
 def run_search_and_summarize(query):
 
-  scraper = WebScraper()
-  summarizer = TextSummarizer()
+  scraper = WebSearcher()
+  summarizer = ImprovedText()
   file_mgr = FileManager('summaries')
   dup_detector = DuplicateDetector()
   err_logger = ErrorLogger('errors.log')
@@ -51,6 +51,7 @@ if st.button('Summarize'):
   
   st.success('Summarization complete!')
 
+  file_mgr = FileManager('summaries')  
   st.download_button(
     label='Download Summaries',
     data=file_mgr.get_zip_file(), 
