@@ -1,8 +1,11 @@
-class ErrorHandling:
+import logging
 
-    def __init__(self, error_file_path='error_log.txt'):
-        self.error_file_path = error_file_path
+class ErrorLogger:
 
-    def log_error(self, url, error_message):
-        with open(self.error_file_path, 'a') as f:
-            f.write(f"URL: {url}, Error: {error_message}\n")
+  def __init__(self, log_file):
+    self.logger = logging.getLogger(__name__)
+    handler = logging.FileHandler(log_file)
+    self.logger.addHandler(handler)
+
+  def log(self, error):
+    self.logger.error(error)

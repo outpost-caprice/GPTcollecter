@@ -1,12 +1,22 @@
+import os
+from pathlib import Path
+from zipfile import ZipFile
 
-def save_to_file(summary, url, file_path='summary.txt'):
-    with open(file_path, 'a') as f:
-        f.write(f"Summary: {summary}\n")
-        f.write(f"URL: {url}\n\n")
+class FileManager:
 
-def create_zip_file(files, zip_file_name):
-    import zipfile
-    import os
-    with zipfile.ZipFile(zip_file_name, 'w') as zipf:
-        for file in files:
-            zipf.write(file, os.path.basename(file))
+  def __init__(self, output_dir):
+    self.output_dir = Path(output_dir)
+
+  def save_summary(self, text, url):
+    filename = self._get_filename(url)
+    file_path = self.output_dir / filename
+    with open(file_path, 'w') as f:
+      f.write(text)
+
+  def _get_filename(self, url):
+    return url.replace('/', '_') + '.txt'
+
+  def make_zipfile(self, name):
+    with ZipFile(name, 'w') as zip:
+      for path in self.output_dir.glob('*'):
+        zip.write(path, path.name)
