@@ -4,6 +4,7 @@ from file_management import FileManagement
 from duplicate_content_management import DuplicateContentManagement
 from error_handling import ErrorHandling
 
+error_log = ErrorHandling('main_errors.log') 
 def main():
     #全クラス初期化
     web_search = WebSearchAndScraping()
