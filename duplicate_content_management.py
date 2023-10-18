@@ -1,7 +1,8 @@
-
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from error_handling import ErrorHandling
 
+error_log = ErrorHandling('duplicate_errors.log')
 class DuplicateContentManager:
     def __init__(self):
         self.tfidf_vectorizer = TfidfVectorizer()
@@ -18,8 +19,9 @@ class DuplicateContentManager:
     def find_similar(self, threshold=0.8):
         similar_pairs = []
         cosine_matrix = cosine_similarity(self.vectors)
-        for i in range(len(self.summaries)):
-            for j in range(i+1, len(self.summaries)):
-                if cosine_matrix[i][j] >= threshold:
-                    similar_pairs.append((i, j))
+        for pair in similar_pairs:
+            i, j = pair
+            if cosine_matrix[i][j] >= 0.8:
+                error_log.log_error(f"Summary {i} and {j}", "Over 80% similarity found")
+
         return similar_pairs

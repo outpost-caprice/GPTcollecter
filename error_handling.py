@@ -1,6 +1,6 @@
-
 class ErrorHandling:
-    def __init__(self, error_file_path='error_urls.txt'):
+
+    def __init__(self, error_file_path='error_log.txt'):
         self.error_file_path = error_file_path
 
     def log_error(self, url, error_message):
