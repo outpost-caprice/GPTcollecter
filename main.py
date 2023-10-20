@@ -6,7 +6,7 @@ from ErrorLogger import ErrorLogger
 
 error_log = ErrorLogger('main_errors.log') 
 
-def main():
+def main(query, num_results):
 
   scraper = WebSearcher()
   summarizer = ImprovedText()
@@ -15,7 +15,7 @@ def main():
   err_logger = ErrorLogger('errors.log')
 
   try:
-    results = scraper.search('query')
+    results = scraper.search(query, num_results)
     
     for url in results:
       content = scraper.get_content(url)
