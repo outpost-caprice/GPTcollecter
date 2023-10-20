@@ -1,5 +1,6 @@
 from googleapiclient.discovery import build
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 import os
 
 class WebSearcher:
@@ -8,7 +9,7 @@ class WebSearcher:
     self.cse_id = os.environ['GOOGLE_CSE_ID']
     
     # ChromeDriverの場所を指定
-    driver_path = os.environ["DRIVER_PATH"]
+    driver_path = os.environ['DRIVER_PATH']
     # FirefoxからChromeに変更
     self.driver = webdriver.Chrome(executable_path=driver_path)
 
@@ -19,4 +20,5 @@ class WebSearcher:
 
   def fetch_page(self, url):
     self.driver.get(url)
-    return self.driver.page_source
+    full_text = self.driver.find_element(By.TAG_NAME, 'body').text
+    return full_text
