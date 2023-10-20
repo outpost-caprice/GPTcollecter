@@ -1,11 +1,11 @@
 from googleapiclient.discovery import build
 from selenium import webdriver
+import os
 
 class WebSearcher:
-
-  def __init__(self, api_key, cse_id):
-    self.api_key = api_key
-    self.cse_id = cse_id
+  def __init__(self):
+    self.api_key = os.getenv("GOOGLE_API_KEY")
+    self.cse_id = os.getenv("GOOGLE_CSE_ID")
     self.driver = webdriver.Firefox()
 
   def search(self, query, num_results=10):
