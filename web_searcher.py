@@ -1,4 +1,5 @@
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
+import langchain
 from langchain.integrations.document_loaders.url import SeleniumURLLoader
 import os
 
