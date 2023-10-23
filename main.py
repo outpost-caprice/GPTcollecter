@@ -2,7 +2,7 @@ import asyncio
 from web_searcher import WebSearcher
 from ImprovedText import ImprovedText
 from FileManager import FileManager
-from difference import DuplicateDetector
+from difference import DuplicateDetector  # 重複検出クラスをインポート
 from error_log import ErrorLogger
 
 async def summarize_content(summarizer, content):
@@ -12,29 +12,26 @@ def main(query, num_results):
     scraper = WebSearcher()
     summarizer = ImprovedText()
     file_mgr = FileManager('summaries')
-    dup_detector = DuplicateDetector()
+    dup_detector = DuplicateDetector()  # 重複検出インスタンスを作成
     err_logger = ErrorLogger('main_errors.log')
+    full_texts = []
 
     try:
         results = scraper.search(query, num_results)
         loop = asyncio.get_event_loop()
 
         for url in results:
-            print("Fetching content...")  # フロントエンドに表示するメッセージ
             content = scraper.fetch_page(url)
-
-            print("Summarizing content...")  # フロントエンドに表示するメッセージ
             summary = loop.run_until_complete(summarize_content(summarizer, content))
+            full_texts.append(summary)
 
-            print("Saving summary...")  # フロントエンドに表示するメッセージ
             file_mgr.save_summary(summary, url)
-            dup_detector.add(summary)
+            dup_detector.add(summary)  # 重複検出に要約を追加
 
-        print("Checking for duplicates...")  # フロントエンドに表示するメッセージ
-        if dup_detector.has_duplicates():
-            # 重複処理（省略）
+        if dup_detector.has_duplicates():  # 重複があるかチェック
+            # ここで重複処理を行います。
+            # 重複がある場合、DuplicateDetectorクラスが内部で処理を行います。
 
-        print("Compressing files...")  # フロントエンドに表示するメッセージ
         file_mgr.make_zipfile("summaries.zip")
 
     except Exception as e:
@@ -43,5 +40,7 @@ def main(query, num_results):
     finally:
         scraper.__del__()
 
+    return full_texts
+
 if __name__ == "__main__":
-    main("sample query", 10)
+    print(main("sample query", 10))
