@@ -1,52 +1,37 @@
 import openai
 import os
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains.summarize import load_summarize_chain
+
 class ImprovedText:
+
     def __init__(self, *args, **kwargs):
-        pass
-
-def split_text(self, text, chunk_size=4000):
-
-  chunks = []
-  index = 0
-
-  while index < len(text):
-    end = min(index + chunk_size, len(text))
-    chunk = text[index:end]
-    chunks.append(chunk)
-    index += chunk_size
-
-  return chunks
-
-
-def combine_summaries(self, summaries):
-  
-  combined = ""
-
-  for summary in summaries: 
-    combined += summary + "\n\n"
-
-  return combined
-
-def openai_api_summarize(self, text):
-        messages = [
-            {"role": "system", "content": "あなたは優秀な要約アシスタントです。提供された文章を、できる限り多くの情報を保ちつつ要約してください。"},
-            {"role": "user", "content": text}
-        ]
-
         try:
-            openai.api_key = os.getenv("OPENAI_API_KEY")
-            completion = openai.ChatCompletion.create(
-              model="gpt-3.5-turbo-16k",
-              messages=messages,
-              max_tokens=10000
-            )
+            self.openai_api_key = os.environ.get('OPENAI_API_KEY', '')
+            self.llm = ChatOpenAI(model_name='gpt-3.5-turbo-16k', temperature=0, openai_api_key=self.openai_api_key)
         except Exception as e:
-            print(f"OpenAI API call failed: {e}")
-            return text[:50]
+            print(f"初期化中に未知のエラーが発生しました: {e}")
 
-        return completion.choices[0].message['content']
+    def split_text(self, text, chunk_size=3600, chunk_overlap=100):
+        try:
+            splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+            return splitter.split(text)
+        except MemoryError:
+            print("メモリエラー: テキストが大きすぎて処理できません。")
+            return []
+        except Exception as e:
+            print(f"テキスト分割中に未知のエラーが発生しました: {e}")
+            return []
 
-def summarize_text(self, text):
-        text_chunks = self.split_text(text)
-        summaries = [self.openai_api_summarize(chunk) for chunk in text_chunks]
-        return " ".join(summaries)
+    def summarize_text(self, text):
+        try:
+            text_chunks = self.split_text(text)
+            chain = load_summarize_chain(self.llm, chain_type='map_reduce')
+            summaries = chain.run(text_chunks)
+            return " ".join(summaries)
+        except TimeoutError:
+            print("タイムアウトエラー: 要約処理がタイムアウトしました。")
+            return ""
+        except Exception as e:
+            print(f"テキスト要約中に未知のエラーが発生しました: {e}")
+            return ""
