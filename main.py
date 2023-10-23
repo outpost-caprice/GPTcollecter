@@ -1,36 +1,47 @@
+import asyncio
 from web_searcher import WebSearcher
-from TextSummarizer import ImprovedText
+from ImprovedText import ImprovedText
 from FileManager import FileManager
-from DuplicateDetector import DuplicateDetector
-from ErrorLogger import ErrorLogger
+from difference import DuplicateDetector
+from error_log import ErrorLogger
 
-error_log = ErrorLogger('main_errors.log') 
+async def summarize_content(summarizer, content):
+    return summarizer.summarize_text(content)
 
 def main(query, num_results):
+    scraper = WebSearcher()
+    summarizer = ImprovedText()
+    file_mgr = FileManager('summaries')
+    dup_detector = DuplicateDetector()
+    err_logger = ErrorLogger('main_errors.log')
 
-  scraper = WebSearcher()
-  summarizer = ImprovedText()
-  file_mgr = FileManager('summaries') 
-  dup_detector = DuplicateDetector()
-  err_logger = ErrorLogger('errors.log')
+    try:
+        results = scraper.search(query, num_results)
+        loop = asyncio.get_event_loop()
 
-  try:
-    results = scraper.search(query, num_results)
-    
-    for url in results:
-      content = scraper.get_content(url)
-      summary = summarizer.summarize(content) 
+        for url in results:
+            print("Fetching content...")  # フロントエンドに表示するメッセージ
+            content = scraper.fetch_page(url)
 
-      file_mgr.save(summary, url)
-      dup_detector.add(summary)
+            print("Summarizing content...")  # フロントエンドに表示するメッセージ
+            summary = loop.run_until_complete(summarize_content(summarizer, content))
 
-    if dup_detector.has_duplicates():
-      # handle duplicates  
+            print("Saving summary...")  # フロントエンドに表示するメッセージ
+            file_mgr.save_summary(summary, url)
+            dup_detector.add(summary)
 
-        file_mgr.compress()
+        print("Checking for duplicates...")  # フロントエンドに表示するメッセージ
+        if dup_detector.has_duplicates():
+            # 重複処理（省略）
 
-  except Exception as e:
-    err_logger.log(e)
+        print("Compressing files...")  # フロントエンドに表示するメッセージ
+        file_mgr.make_zipfile("summaries.zip")
 
-  finally:
-    scraper.close()
+    except Exception as e:
+        err_logger.log(f"An error occurred: {e}")
+
+    finally:
+        scraper.__del__()
+
+if __name__ == "__main__":
+    main("sample query", 10)
