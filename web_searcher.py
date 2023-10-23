@@ -1,41 +1,42 @@
-from googleapiclient.discovery import build
-from selenium import webdriver
-from selenium.webdriver.common.by import By  
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
+from langchain.utilities.google_search import GoogleSearchAPIWrapper
+from langchain.integrations.document_loaders.url import SeleniumURLLoader
 import os
 
 class WebSearcher:
 
-  def __init__(self):
-    self.api_key = os.environ.get('GOOGLE_API_KEY', '')  
-    self.cse_id = os.environ.get('GOOGLE_CSE_ID', '')
-    self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    def __init__(self):
+        try:
+            self.api_key = os.environ.get('GOOGLE_API_KEY', '')
+            self.cse_id = os.environ.get('GOOGLE_CSE_ID', '')
+            self.search_api = GoogleSearchAPIWrapper(api_key=self.api_key, cse_id=self.cse_id)
+            self.url_loader = SeleniumURLLoader()
+        except Exception as e:
+            print(f"初期化中に未知のエラーが発生しました: {e}")
 
-  def search(self, query, num_results, start_index=1):
-    try:
-      service = build("customsearch", "v1", developerKey=self.api_key)
-      result = service.list(q=query, cx=self.cse_id, 
-              num=num_results, start=start_index).execute()
-      return [item['link'] for item in result['items']]
-    except Exception as e:
-      print(f"An error occurred: {e}")
-      return []
+    def search(self, query, num_results, start_index=1):
+        try:
+            results = self.search_api.search(query, num_results=num_results, start_index=start_index)
+            return [item['link'] for item in results]
+        except ConnectionError:
+            print("接続エラー: Google Search APIに接続できませんでした。")
+            return []
+        except TimeoutError:
+            print("タイムアウトエラー: Google Search APIへのリクエストがタイムアウトしました。")
+            return []
+        except Exception as e:
+            print(f"検索中に未知のエラーが発生しました: {e}")
+            return []
 
-  def fetch_page(self, url):
-    try:
-      self.driver.get(url)
-      element_present = EC.presence_of_element_located((By.TAG_NAME, 'body'))
-      WebDriverWait(self.driver, 10).until(element_present)  
-      full_text = self.driver.find_element(By.TAG_NAME, 'body').text
-      return full_text
-    except Exception as e:
-      print(f"An error occurred: {e}")
-      return ""
-
-  def __del__(self):
-    self.driver.quit()
+    def fetch_page(self, url):
+        try:
+            full_text = self.url_loader.load(url)
+            return full_text
+        except ConnectionError:
+            print("接続エラー: URLに接続できませんでした。")
+            return ""
+        except TimeoutError:
+            print("タイムアウトエラー: URLの読み込みがタイムアウトしました。")
+            return ""
+        except Exception as e:
+            print(f"ページ取得中に未知のエラーが発生しました: {e}")
+            return ""
