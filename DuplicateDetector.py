@@ -1,5 +1,5 @@
 import difflib
-from error_log import ErrorLogger
+from ErrorLogger import ErrorLogger
 
 class DuplicateDetector:
 

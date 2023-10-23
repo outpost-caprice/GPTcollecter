@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from zipfile import ZipFile
-from error_log import ErrorLogger
+from ErrorLogger import ErrorLogger
 
 class FileManager:
 

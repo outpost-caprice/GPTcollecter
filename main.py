@@ -1,9 +1,9 @@
 import asyncio
 from web_searcher import WebSearcher
-from ImprovedText import ImprovedText
+from TextSummarizer import ImprovedText
 from FileManager import FileManager
-from difference import DuplicateDetector  # 重複検出クラスをインポート
-from error_log import ErrorLogger
+from DuplicateDetector import DuplicateDetector  # 重複検出クラスをインポート
+from ErrorLogger import ErrorLogger
 
 async def summarize_content(summarizer, content):
     return summarizer.summarize_text(content)
@@ -32,7 +32,7 @@ def main(query, num_results):
             # ここで重複処理を行います。
             # 重複がある場合、DuplicateDetectorクラスが内部で処理を行います。
 
-        file_mgr.make_zipfile("summaries.zip")
+            file_mgr.make_zipfile("summaries.zip")
 
     except Exception as e:
         err_logger.log(f"An error occurred: {e}")
