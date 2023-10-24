@@ -1,7 +1,8 @@
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
 import langchain
-from langchain.integrations.document_loaders.url import SeleniumURLLoader
+import requests
 import os
+from langchain.document_loaders import UnstructuredURLLoader
 
 class WebSearcher:
 
@@ -10,7 +11,7 @@ class WebSearcher:
             self.api_key = os.environ.get('GOOGLE_API_KEY', '')
             self.cse_id = os.environ.get('GOOGLE_CSE_ID', '')
             self.search_api = GoogleSearchAPIWrapper(api_key=self.api_key, cse_id=self.cse_id)
-            self.url_loader = SeleniumURLLoader()
+            self.url_loader = UnstructuredURLLoader()
         except Exception as e:
             print(f"初期化中に未知のエラーが発生しました: {e}")
 
@@ -32,12 +33,6 @@ class WebSearcher:
         try:
             full_text = self.url_loader.load(url)
             return full_text
-        except ConnectionError:
-            print("接続エラー: URLに接続できませんでした。")
-            return ""
-        except TimeoutError:
-            print("タイムアウトエラー: URLの読み込みがタイムアウトしました。")
-            return ""
         except Exception as e:
             print(f"ページ取得中に未知のエラーが発生しました: {e}")
             return ""
