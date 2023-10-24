@@ -4,6 +4,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.docstore.document import Document
+import asyncio
 
 class ImprovedText:
 
@@ -25,7 +26,7 @@ class ImprovedText:
             print(f"テキスト分割中に未知のエラーが発生しました: {e}")
             return []
 
-    def summarize(self, content: str) -> str:
+    async def summarize(self, content: str) -> str:
         try:
             text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=3600,

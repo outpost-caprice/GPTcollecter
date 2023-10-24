@@ -4,14 +4,15 @@ import requests
 import os
 from langchain.document_loaders import UnstructuredURLLoader
 
+API_KEY = os.environ.get('GOOGLE_API_KEY', '')
+CSE_ID  = os.environ.get('GOOGLE_CSE_ID', '')
 class WebSearcher:
-
     def __init__(self):
         try:
-            self.api_key = os.environ.get('GOOGLE_API_KEY', '')
-            self.cse_id = os.environ.get('GOOGLE_CSE_ID', '')
-            self.search_api = GoogleSearchAPIWrapper(api_key=self.api_key, cse_id=self.cse_id)
+            self.api_key = API_KEY
+            self.cse_id = CSE_ID
             self.url_loader = UnstructuredURLLoader()
+            self.search_api = GoogleSearchAPIWrapper(api_key=self.api_key, cse_id=self.cse_id)
         except Exception as e:
             print(f"初期化中に未知のエラーが発生しました: {e}")
 
