@@ -10,7 +10,7 @@ class ImprovedText:
     def __init__(self, *args, **kwargs):
         try:
             self.openai_api_key = os.environ.get('OPENAI_API_KEY', '')
-            self.llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0, openai_api_key=self.openai_api_key)
+            self.llm = ChatOpenAI(model_name='gpt-3.5-turbo-16k', temperature=0, openai_api_key=self.openai_api_key)
         except Exception as e:
             print(f"初期化中に未知のエラーが発生しました: {e}")
 
