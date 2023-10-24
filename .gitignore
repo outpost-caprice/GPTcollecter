@@ -2,3 +2,6 @@
 /.venv
 /__pycache__
 /chromedriver-win64
+file_manager_errors.log
+duplicate_detector_errors.log
+main_errors.log
