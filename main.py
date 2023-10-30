@@ -1,10 +1,11 @@
 import asyncio
-from asyncio import Semaphore  
-import TextSummarizer 
+from asyncio import Semaphore
+import TextSummarizer
 from web_searcher import WebSearcher
-from FileManager import FileManager
+from FileManager import FileManager 
 from DuplicateDetector import DuplicateDetector
-from ErrorLogger import ErrorLogger, LogLevel
+from ErrorLogger import LogLevel
+import ErrorLogger
 
 async def fetch_and_summarize(url, sem):
   async with sem:
@@ -18,45 +19,26 @@ async def get_content(url):
 
 async def main(query, num_results):
 
-  logger = ErrorLogger('main.log')
+  logger = ErrorLogger.ErrorLogger()
 
-  summarizer = TextSummarizer.ImprovedText()
+  summarizer = TextSummarizer.TextSummarizer(logger)
 
   sem = Semaphore(10)
 
   try:
-    searcher = WebSearcher()
-    file_mgr = FileManager('summaries')
-    dup_detector = DuplicateDetector()
+    searcher = WebSearcher.WebSearcher()
+    file_mgr = FileManager.FileManager('summaries')
+    dup_detector = DuplicateDetector.DuplicateDetector()
 
     tasks = []
     results = searcher.search(query, num_results)
 
     for url in results:
-      task = asyncio.create_task(fetch_and_summarize(url, sem))
+      task = asyncio.create_task(fetch_and_summarize(url, sem)) 
       tasks.append(task)
 
-    try:
-      summaries = await asyncio.gather(*tasks, timeout=3600)
-    except asyncio.TimeoutError:
-      pending = asyncio.all_tasks() - {asyncio.current_task()}
-      for task in pending:
-        task.cancel()
-      print("Processing timed out")
-    finally:
-      for task in pending:
-        try:
-          await task 
-        except asyncio.CancelledError:
-          pass
-    
-    for url, summary in summaries:
-      filename = create_filename(url)
-      file_mgr.save_summary(summary, filename) 
-      dup_detector.add(summary, url)
-
-    file_mgr.make_zipfile('summaries.zip')
-
+    summaries = await asyncio.gather(*tasks)
+  
   except Exception as e:
     logger.log(f"Error: {e}", LogLevel.ERROR)
 
