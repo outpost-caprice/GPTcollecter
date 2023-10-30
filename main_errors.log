@@ -3,3 +3,4 @@
 2023-10-30 11:55:44,969 - ERROR - An error occurred: 'WebSearcher' object has no attribute 'search_api'
 2023-10-30 12:14:21,807 - ERROR - An error occurred: 'WebSearcher' object has no attribute 'search_api'
 2023-10-30 12:20:57,878 - ERROR - An error occurred: 'WebSearcher' object has no attribute 'search_api'
+2023-10-30 12:30:30,130 - ERROR - An error occurred: 'WebSearcher' object has no attribute 'search_api'
