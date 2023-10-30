@@ -1,13 +1,16 @@
+from ErrorLogger import ErrorLogger, LogLevel
+logger = ErrorLogger("text_summarizer_errors.log")
 import openai
-from langchain.text_splitter import RecursiveCharacterTextSplitter  
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import Summarize
 import os
 
-class TextSummarizer:
 
+class TextSummarizer:
+    
   def __init__(self):
     self.openai_key = os.getenv('OPENAI_API_KEY')
-    self.model = 'gpt-3.5-turbo'  
+    self.model = 'gpt-3.5-turbo'
 
     if not self.openai_key:
       raise ValueError("OPENAI_API_KEYが設定されていません")
@@ -26,5 +29,5 @@ class TextSummarizer:
       raise RuntimeError(f"要約エラー: {e}") from e
       
   def split_text(self, text):
-    splitter = RecursiveCharacterTextSplitter(3600, 100) 
+    splitter = RecursiveCharacterTextSplitter(3600, 100)
     return splitter.split(text)

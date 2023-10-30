@@ -1,17 +1,27 @@
+from ErrorLogger import ErrorLogger, LogLevel
+logger = ErrorLogger("main_errors.log")
 import asyncio
 from asyncio import Semaphore
 import TextSummarizer
 from web_searcher import WebSearcher
-from FileManager import FileManager 
+from FileManager import FileManager
 from DuplicateDetector import DuplicateDetector
 from ErrorLogger import LogLevel
 import ErrorLogger
 
+
 async def fetch_and_summarize(url, sem):
-  async with sem:
-    content = await get_content(url)
-    summary = await TextSummarizer.summarize(content) 
-    return url, summary
+  try:
+    
+    async with sem:
+      content = await get_content(url)
+      summary = await TextSummarizer.summarize(content)
+      return url, summary
+      
+  except Exception as e:
+    logger.log(f"Error while fetching and summarizing: {e}", LogLevel.ERROR)
+    return url, None
+    
 
 async def get_content(url):
   searcher = WebSearcher()
@@ -34,7 +44,7 @@ async def main(query, num_results):
     results = searcher.search(query, num_results)
 
     for url in results:
-      task = asyncio.create_task(fetch_and_summarize(url, sem)) 
+      task = asyncio.create_task(fetch_and_summarize(url, sem))
       tasks.append(task)
 
     summaries = await asyncio.gather(*tasks)

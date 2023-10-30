@@ -1,11 +1,14 @@
+from ErrorLogger import ErrorLogger, LogLevel
+logger = ErrorLogger("file_manager_errors.log")
 import os
 from pathlib import Path
 from zipfile import ZipFile
 from datetime import datetime
 from ErrorLogger import ErrorLogger
 
-class FileManager:
 
+class FileManager:
+    
   def __init__(self, output_dir, log_file="file_manager_errors.log"):
     self.output_dir = Path(output_dir)
     self.logger = ErrorLogger(log_file)
@@ -13,7 +16,7 @@ class FileManager:
 
   def _create_output_dir(self):
     try:
-      self.output_dir.mkdir(parents=True, exist_ok=True) 
+      self.output_dir.mkdir(parents=True, exist_ok=True)
     except Exception as e:
       self.logger.log(f"出力ディレクトリの作成中にエラーが発生しました: {e}")
 

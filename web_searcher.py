@@ -1,20 +1,24 @@
+from ErrorLogger import ErrorLogger, LogLevel
+logger = ErrorLogger("web_searcher_errors.log")
 from langchain.utilities import GoogleSearchAPIWrapper, LoadDocumentFromURL
 from langchain.chat_models import ChatOpenAI  
 import os
+
 
 class WebSearcher:
 
   def __init__(self):
     # 環境変数からAPIキーを取得
-    self.api_key = os.getenv('GOOGLE_API_KEY')   
+    self.api_key = os.getenv('GOOGLE_API_KEY')    
     self.cse_id = os.getenv('GOOGLE_CSE_ID')
     self.openai_key = os.getenv('OPENAI_API_KEY')
 
     # APIの初期化
     self.search_api = GoogleSearchAPIWrapper(self.api_key, self.cse_id)
     self.url_loader = LoadDocumentFromURL()
+    
     self.chat_api = ChatOpenAI(self.openai_key)
-
+    
   def search(self, query, num):
     try:
       results = self.search_api.search(query, num)

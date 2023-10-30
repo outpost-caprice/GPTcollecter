@@ -1,3 +1,5 @@
+from ErrorLogger import ErrorLogger, LogLevel
+logger = ErrorLogger("duplicate_detector_errors.log")
 import difflib
 import hashlib
 from ErrorLogger import ErrorLogger
