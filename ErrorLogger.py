@@ -1,37 +1,43 @@
+from enum import Enum
 import logging
 import datetime
 
+class LogLevel(Enum):
+  DEBUG = 10
+  INFO = 20 
+  WARNING = 30
+  ERROR = 40
+
 class ErrorLogger:
 
-    def __init__(self, log_file=None):
-        
-        # ログファイル名の自動生成
-        if log_file is None:
-            now = datetime.datetime.now()
-            log_file = now.strftime("errors_%Y%m%d_%H%M%S.log")
-            
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
+  def __init__(self, log_file=None):
 
-        # ログのフォーマット指定
-        formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
+    if log_file is None:
+      now = datetime.datetime.now()
+      log_file = now.strftime("errors_%Y%m%d_%H%M%S.log")
 
-        # ログハンドラの設定
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(formatter)
-        self.logger.addHandler(file_handler)
+    self.logger = logging.getLogger(__name__)
+    self.logger.setLevel(logging.INFO)
 
-    def log(self, message, level='error'):
-        
-        # レベルに応じたログ出力
-        if level == 'debug':
-            self.logger.debug(message)
-        elif level == 'info':
-            self.logger.info(message)
-        elif level == 'warning':
-            self.logger.warning(message)
-        elif level == 'error':
-            self.logger.error(message)
-        else:
-            # 不明なログレベルの場合はエラーレベルで出力
-            self.logger.error(f"Unknown log level: {level}")
+    formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
+
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(formatter)
+    self.logger.addHandler(file_handler)
+
+  def log(self, message, level=LogLevel.ERROR):
+
+    if level == LogLevel.DEBUG:
+      self.logger.debug(message)
+
+    elif level == LogLevel.INFO:
+      self.logger.info(message)
+
+    elif level == LogLevel.WARNING:
+      self.logger.warning(message)
+
+    elif level == LogLevel.ERROR:
+      self.logger.error(message)
+
+    else:
+      self.logger.error(f"Unknown log level: {level}")
