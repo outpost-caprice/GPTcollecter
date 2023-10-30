@@ -1,5 +1,3 @@
-# main.py
-
 import asyncio
 import time
 from web_searcher import WebSearcher
@@ -11,9 +9,12 @@ from ErrorLogger import ErrorLogger
 async def summarize_content(summarizer, content):
   return await summarizer.summarize(content)
 
-def main(query, num_results):
-
+async def main(query, num_results):
   scraper = WebSearcher()
+  if scraper.search_api is None:
+    print("Google Search API is not initialized. Exiting.")
+    return
+
   summarizer = ImprovedText()
   file_mgr = FileManager('summaries')
   dup_detector = DuplicateDetector()
@@ -23,21 +24,23 @@ def main(query, num_results):
 
   try:
     results = scraper.search_api.search(query, num_results=num_results)
+    tasks = []
 
-    loop = asyncio.get_event_loop()
     for url in results:
-      # 検索リクエストの間に5秒待機
-      time.sleep(5) 
+      await asyncio.sleep(5)  # 非同期のsleep
 
       content = scraper.fetch_page(url)
       
-      # 要約結果の品質チェック
       if len(content) < 500:
         err_logger.log(f"Content too short to summarize: {url}")
         continue
-            
-      summary = loop.run_until_complete(summarize_content(summarizer, content))
-      
+
+      task = asyncio.ensure_future(summarize_content(summarizer, content))
+      tasks.append(task)
+
+    summaries = await asyncio.gather(*tasks)
+
+    for summary, url in zip(summaries, results):
       full_texts.append(summary)
       file_mgr.save_summary(summary, url)
       dup_detector.add(summary)
@@ -47,5 +50,9 @@ def main(query, num_results):
       
   except Exception as e:
     err_logger.log(f"An error occurred: {e}")
-    
+
   return full_texts
+
+if __name__ == "__main__":
+  loop = asyncio.get_event_loop()
+  loop.run_until_complete(main("your_query_here", 10))
