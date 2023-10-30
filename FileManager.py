@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from zipfile import ZipFile
+from datetime import datetime
 from ErrorLogger import ErrorLogger
 
 class FileManager:
@@ -18,15 +19,28 @@ class FileManager:
 
     def save_summary(self, text, url):
         try:
-            filename = self._get_filename(url)
-            file_path = self.output_dir / filename
-            with open(file_path, 'w') as f:
+            filename = self._get_unique_filename(url)
+            filepath = self.output_dir / filename
+            with open(filepath, 'w') as f:
                 f.write(text)
+            
+            # バックアップ
+            self._backup(filepath)
+            
         except Exception as e:
             self.logger.log(f"サマリーの保存中にエラーが発生しました: {e}")
 
-    def _get_filename(self, url):
-        return url.replace('/', '_') + '.txt'
+    def _get_unique_filename(self, url):
+        basename = url.replace('/', '_')
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        return f"{basename}_{timestamp}.txt"
+
+    def _backup(self, filepath):
+        backup_dir = self.output_dir / "backups"
+        backup_dir.mkdir(exist_ok=True)
+        backup_path = backup_dir / filepath.name
+        with open(filepath) as src, open(backup_path, 'w') as dst:
+            dst.write(src.read())
 
     def make_zipfile(self, name):
         try:
