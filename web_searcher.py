@@ -1,18 +1,15 @@
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
-import langchain
-import requests
+from langchain.chat_models import ChatOpenAI
 import os
-from langchain.document_loaders import UnstructuredURLLoader
 
-API_KEY = os.environ.get('GOOGLE_API_KEY', '')
-CSE_ID  = os.environ.get('GOOGLE_CSE_ID', '')
 class WebSearcher:
     def __init__(self):
         try:
-            self.api_key = API_KEY
-            self.cse_id = CSE_ID
-            self.url_loader = UnstructuredURLLoader([]) 
-            self.search_api = GoogleSearchAPIWrapper(api_key=self.api_key, cse_id=self.cse_id)
+            self.api_key = os.getenv('GOOGLE_API_KEY')
+            self.cse_id = os.getenv('GOOGLE_CSE_ID')
+            self.search_api = GoogleSearchAPIWrapper(google_api_key=self.api_key, cse_id=self.cse_id)
+            self.openai_api_key = os.getenv('OPENAI_API_KEY')
+            self.llm = ChatOpenAI(openai_api_key=self.openai_api_key, model_name='gpt-3.5-turbo-16k', temperature=0)
         except Exception as e:
             print(f"初期化中に未知のエラーが発生しました: {e}")
 
