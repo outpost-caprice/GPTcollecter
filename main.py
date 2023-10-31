@@ -6,11 +6,13 @@ from ErrorLogger import ErrorLogger, LogLevel
 from web_searcher import WebSearcher  # WebSearcherをインポート
 from TextSummarizer import TextSummarizer  # TextSummarizerをインポート
 
-async def fetch_and_summarize(url, sem, summarizer, logger):  # loggerを引数に追加
+logger = ErrorLogger(log_file="main_errors.log", log_level=LogLevel.INFO)
+
+async def fetch_and_summarize(url, sem, summarizer, logger):  # loggerとsummarizerを引数に追加
     try:
         async with sem:
             content = await get_content(url, logger)  # loggerを引数に追加
-            summary = await summarizer.summarize(content)
+            summary = await summarizer.summarize(content)  # summarizerを使用
             return url, summary
     except Exception as e:
         logger.log(f"Error while fetching and summarizing: {e}", LogLevel.ERROR)
@@ -20,13 +22,8 @@ async def get_content(url, logger):  # loggerを引数に追加
     searcher = WebSearcher(logger)  # loggerを渡す
     return await searcher.fetch_page_with_async_chromium_loader([url])  # 非同期メソッドを呼び出す
 
-
-async def get_content(url):
-    searcher = WebSearcher(logger)  # loggerを渡す
-    return await searcher.fetch_page_with_async_chromium_loader([url])  # 非同期メソッドを呼び出す
-
 async def main(query, num_results):
-    logger = ErrorLogger(log_file="main_errors.log", log_level=LogLevel.INFO)
+    # loggerはすでに上で定義されているので、この行は不要
     searcher = WebSearcher(logger)
     summarizer = TextSummarizer(logger)
     file_mgr = FileManager(logger, 'summaries')
@@ -37,7 +34,7 @@ async def main(query, num_results):
     try:
         results = searcher.search(query, num_results)
         for url in results:
-            task = asyncio.create_task(fetch_and_summarize(url, sem, summarizer))
+            task = asyncio.create_task(fetch_and_summarize(url, sem, summarizer, logger))  # loggerとsummarizerを引数に追加
             tasks.append(task)
         summaries = await asyncio.gather(*tasks)
     except Exception as e:
