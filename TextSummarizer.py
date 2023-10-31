@@ -1,16 +1,14 @@
-from ErrorLogger import ErrorLogger, LogLevel
-logger = ErrorLogger("text_summarizer_errors.log")
 import openai
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import Summarize
 import os
 
-
 class TextSummarizer:
     
-  def __init__(self):
+  def __init__(self, logger):
     self.openai_key = os.getenv('OPENAI_API_KEY')
     self.model = 'gpt-3.5-turbo'
+    self.logger = logger  # ErrorLoggerのインスタンスを受け取る
 
     if not self.openai_key:
       raise ValueError("OPENAI_API_KEYが設定されていません")

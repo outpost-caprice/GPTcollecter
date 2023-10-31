@@ -1,15 +1,12 @@
-from ErrorLogger import ErrorLogger, LogLevel
-logger = ErrorLogger("duplicate_detector_errors.log")
 import difflib
 import hashlib
-from ErrorLogger import ErrorLogger
 
 class DuplicateDetector:
 
-  def __init__(self, log_file="duplicate_detector_errors.log"):
+  def __init__(self, logger, log_file="duplicate_detector_errors.log"):
     self.summaries = []
     self.hashes = set()
-    self.logger = ErrorLogger(log_file)
+    self.logger = logger  # ErrorLoggerのインスタンスを受け取る
 
   def add(self, text, url):
     try:

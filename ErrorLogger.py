@@ -1,4 +1,3 @@
-
 import logging
 from enum import Enum
 import datetime
@@ -11,14 +10,14 @@ class LogLevel(Enum):
 
 class ErrorLogger:
 
-  def __init__(self, log_file=None):
+  def __init__(self, log_file=None, log_level=LogLevel.INFO):
     # ログファイル名の自動設定
     if log_file is None:
       now = datetime.datetime.now()
       log_file = now.strftime("errors_%Y%m%d_%H%M%S.log")
     
     self.logger = logging.getLogger(__name__)
-    self.logger.setLevel(logging.INFO)
+    self.logger.setLevel(log_level.value)  # ログレベルを動的に設定
 
     # loggingモジュールのフォーマッタを使用 
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
