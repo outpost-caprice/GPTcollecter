@@ -1,4 +1,4 @@
-from langchain.utilities import GoogleSearchAPIWrapper, LoadDocumentFromURL
+from langchain.utilities import GoogleSearchAPIWrapper
 from langchain.chat_models import ChatOpenAI  
 import os
 from langchain.document_loaders import AsyncChromiumLoader
@@ -13,7 +13,6 @@ class WebSearcher:
     self.openai_key = os.getenv('OPENAI_API_KEY')
     self.logger = logger  # ErrorLoggerのインスタンスを受け取る
     self.search_api = GoogleSearchAPIWrapper(self.api_key, self.cse_id)
-    self.url_loader = LoadDocumentFromURL()
     self.chat_api = ChatOpenAI(self.openai_key)
     self.async_chromium_loader = AsyncChromiumLoader()
     self.html2text_transformer = Html2TextTransformer()
